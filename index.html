@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Contract - IV</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css" rel="stylesheet">
+
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+</head>
+<body>
+    <div class="navbar navbar-expand-lg navbar-dark bg-dark text-primary text-center">
+        <a class="navbar-brand font-weight-bolder">Smart Contract IV - ELECTION 2020</a>
+    </div>
+    <div class="container text-justify">
+        <div class="row">
+            <div class="col-md-6">
+                <h3 class="text-warning font-weight-bolder">Candidate 1</h3>
+                <hr>
+                <span class="font-weight-bolder">Information</span>
+                <hr class="text-danger">
+                <h5 id="_id1"></h5>
+                <h5 id="_name1"></h5>
+                <h5 id="_votes1" class="text-danger font-weight-bolder"></h5>
+                <div class="alert alert-primary" role="alert" id="alertgetfailed1">
+                    <h6><strong>Hey Voter! </strong><span id="msg1"></span></h6>
+                </div>
+                <hr>
+                <button id="voteforc1" class="btn btn-primary">VOTE FOR <span id="_vname1"></span></button>
+            </div>
+            <div class="col-md-6">
+                <h3 class="text-warning font-weight-bolder">Candidate 2</h3>
+                <hr>
+                <span class="font-weight-bolder">Information</span>
+                <hr class="text-danger">
+                <h5 id="_id2"></h5>
+                <h5 id="_name2"></h5>
+                <h5 id="_votes2" class="text-danger font-weight-bolder"></h5>
+                <div class="alert alert-success" role="alert" id="alertgetfailed2">
+                    <h6><strong>Hey Voter! </strong><span id="msg2"></span></h6>
+                </div>
+                <hr>
+                <button id="voteforc2" class="btn btn-success">VOTE FOR <span id="_vname2"></span></button>
+            </div>
+        </div>
+        <hr>
+        <div class="row text-center">
+            <div class="col-md-12">
+                <h1 class="text-capitalize elegant-color-dark text-light font-weight-bolder">
+                    Total Votes : <span id="fulltotalcount"></span>
+                </h1>
+                <div class="alert alert-success" role="alert" id="alertgetfailed">
+                    <h6><strong>Please Contact Administrator!</strong><span id="msg"></span></h6>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            $('#alertgetfailed').hide();
+            $('#alertgetfailed1').hide();
+            $('#alertgetfailed2').hide();
+
+            if(typeof web3 !== 'undefined')
+            {
+                web3 = new Web3(Web3.eth.currentProvider);
+            }
+            else
+            {
+                web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+            }
+            web3.eth.defaultAccount = web3.eth.accounts[2];
+            var contract = new web3.eth.Contract([
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_name",
+                            "type": "string"
+                        }
+                    ],
+                    "name": "addnewcandidate",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_cindex",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "voting",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "constructor"
+                },
+                {
+                    "constant": true,
+                    "inputs": [
+                        {
+                            "name": "_cindex",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getcandidatedetails",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "uint256"
+                        },
+                        {
+                            "name": "",
+                            "type": "string"
+                        },
+                        {
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "constant": true,
+                    "inputs": [
+                        {
+                            "name": "_cindex",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getcandidatevotes",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "getTotalvotes",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }
+            ],'0x9d53fC26CD5A2EdF9e5B68c808510F27860d5CD2');
+
+            contract.methods.getTotalvotes().call(function(error, result){
+               if(!error)
+               {
+                   $('#fulltotalcount').html(result[0]);
+               }
+               else
+               {
+                   $('#msg').html(error);
+                   $("#alertgetfailed").fadeTo(2000, 500).slideUp(1000, function () {
+                       $("#alertgetfailed").slideUp(1000);
+                   });
+               }
+            });
+
+            contract.methods.getcandidatedetails(0).call(function(error, result){
+              if(!error)
+              {
+                  $('#_id1').html("ID : " + result[0]);
+                  $('#_name1').html("NAME : " + result[1]);
+                  $('#_votes1').html("VOTES : " + result[2]);
+                  $('#_vname1').html(result[1]);
+              }
+              else
+              {
+                  $('#msg1').html(error);
+                  $("#alertgetfailed1").fadeTo(2000, 500).slideUp(1000, function () {
+                      $("#alertgetfailed1").slideUp(1000);
+                  });
+              }
+           });
+
+            contract.methods.getcandidatedetails(1).call(function(error, result){
+                if(!error)
+                {
+                    $('#_id2').html("ID : " + result[0]);
+                    $('#_name2').html("NAME : " + result[1]);
+                    $('#_votes2').html("VOTES : " + result[2]);
+                    $('#_vname2').html(result[1]);
+                }
+                else
+                {
+                    $('#msg2').html(error);
+                    $("#alertgetfailed2").fadeTo(2000, 500).slideUp(1000, function () {
+                        $("#alertgetfailed2").slideUp(1000);
+                    });
+                }
+            });
+
+            $('#voteforc1').click(function(){
+                web3.eth.getAccounts().then(function(accounts){
+                    var acc = accounts[2];
+                    return contract.methods.voting(0).send({from : acc});
+                }).then(function(res){
+                    contract.methods.getcandidatedetails(0).call(function(error, result){
+                        if(!error)
+                        {
+                            $('#_id1').html("ID : " + result[0]);
+                            $('#_name1').html("NAME : " + result[1]);
+                            $('#_votes1').html("VOTES : " + result[2]);
+                            $('#_vname1').html(result[1]);
+                        }
+                        else
+                        {
+                            $('#msg1').html(error);
+                            $("#alertgetfailed1").fadeTo(2000, 500).slideUp(1000, function () {
+                                $("#alertgetfailed1").slideUp(1000);
+                            });
+                        }
+                    });
+
+                    contract.methods.getTotalvotes().call(function(error, result){
+                        if(!error)
+                        {
+                            $('#fulltotalcount').html(result[0]);
+                        }
+                        else
+                        {
+                            $('#msg').html(error);
+                            $("#alertgetfailed").fadeTo(2000, 500).slideUp(1000, function () {
+                                $("#alertgetfailed").slideUp(1000);
+                            });
+                        }
+                    });
+                }).catch(function(res1){
+                    $('#msg1').html( "You are already voted");
+                    $("#alertgetfailed1").fadeTo(2000, 500).slideUp(1000, function () {
+                        $("#alertgetfailed1").slideUp(1000);
+                    });
+                });
+            });
+
+            $('#voteforc2').click(function(){
+                web3.eth.getAccounts().then(function(accounts){
+                    var acc = accounts[2];
+                    return contract.methods.voting(1).send({from : acc});
+                }).then(function(res){
+                    contract.methods.getcandidatedetails(1).call(function(error, result){
+                        if(!error)
+                        {
+                            $('#_id2').html("ID : " + result[0]);
+                            $('#_name2').html("NAME : " + result[1]);
+                            $('#_votes2').html("VOTES : " + result[2]);
+                            $('#_vname2').html(result[1]);
+                        }
+                        else
+                        {
+                            $('#msg2').html(error);
+                            $("#alertgetfailed2").fadeTo(2000, 500).slideUp(1000, function () {
+                                $("#alertgetfailed2").slideUp(1000);
+                            });
+                        }
+                    });
+
+                    contract.methods.getTotalvotes().call(function(error, result){
+                        if(!error)
+                        {
+                            $('#fulltotalcount').html(result[0]);
+                        }
+                        else
+                        {
+                            $('#msg').html(error);
+                            $("#alertgetfailed").fadeTo(2000, 500).slideUp(1000, function () {
+                                $("#alertgetfailed").slideUp(1000);
+                            });
+                        }
+                    });
+                }).catch(function(res2){
+                    $('#msg2').html("You are already voted");
+                    $("#alertgetfailed2").fadeTo(2000, 500).slideUp(1000, function () {
+                        $("#alertgetfailed2").slideUp(1000);
+                    });
+                });
+            });
+        });
+    </script>
+
+
+<!-- JQuery -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- Bootstrap tooltips -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+<!-- Bootstrap core JavaScript -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<!-- MDB core JavaScript -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
+</body>
+</html>
