@@ -1,7 +1,7 @@
 # DAPP-02-ELECTION
 
 Details about project:
-1. Backend => Solidity, JavaScript, Jquery, Web3.js (1.0.0).
+1. Backend => Solidity, JavaScript, JQuery, Web3.js (1.0.0).
 2. Frontend => HTML, JS, Boostrap (MDBoostrap).
 3. Ganache.
 
